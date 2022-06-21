@@ -1,4 +1,4 @@
-module github.com/fixme_my_friend/hw08_envdir_tool
+module github.com/bon3o/otus-hw-01/hw08_envdir_tool
 
 go 1.16
 
