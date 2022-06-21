@@ -19,6 +19,5 @@ func main() {
 		log.Fatal(err)
 	}
 	code := RunCmd(cmd, environments)
-	fmt.Println(code)
 	os.Exit(code)
 }
