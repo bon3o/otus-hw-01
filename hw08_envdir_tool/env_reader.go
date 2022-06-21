@@ -15,14 +15,11 @@ type Environment map[string]EnvValue
 
 var ErrInvalidFileName = errors.New("invalid file name")
 
-// EnvValue helps to distinguish between empty files and files with the first empty line.
 type EnvValue struct {
 	Value      string
 	NeedRemove bool
 }
 
-// ReadDir reads a specified directory and returns map of env variables.
-// Variables represented as files where filename is name of variable, file first line is a value.
 func ReadDir(dir string) (Environment, error) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
