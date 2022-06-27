@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+
+	"github.com/VictoriaMetrics/VictoriaMetrics/lib/logger"
 )
 
 var (
@@ -18,5 +20,11 @@ func init() {
 
 func main() {
 	flag.Parse()
-	// Place your code here.
+	if from == "" || to == "" {
+		logger.Fatalf("from or to path is not passed")
+	}
+	err := Copy(from, to, offset, limit)
+	if err != nil {
+		logger.Fatalf("error while copying file: %s", err)
+	}
 }
