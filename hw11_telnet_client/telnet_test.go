@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -61,5 +63,47 @@ func TestTelnetClient(t *testing.T) {
 		}()
 
 		wg.Wait()
+	})
+	t.Run("empty message", func(t *testing.T) {
+		l, err := net.Listen("tcp", "127.0.0.1:")
+		require.NoError(t, err)
+		defer func() { require.NoError(t, l.Close()) }()
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+			defer wg.Done()
+
+			in := new(bytes.Buffer)
+			out := new(bytes.Buffer)
+
+			timeout, _ := time.ParseDuration("10s")
+
+			client := NewTelnetClient(l.Addr().String(), timeout, ioutil.NopCloser(in), out)
+			require.NoError(t, client.Connect())
+			require.NoError(t, client.Close())
+		}()
+
+		go func() {
+			defer wg.Done()
+
+			conn, err := l.Accept()
+			require.NoError(t, err)
+			require.NotNil(t, conn)
+			defer func() { require.NoError(t, conn.Close()) }()
+
+			request := make([]byte, 1024)
+			_, err = conn.Read(request)
+			require.Equal(t, fmt.Errorf("EOF"), err)
+		}()
+
+		wg.Wait()
+	})
+	t.Run("connect to wrong host", func(t *testing.T) {
+		d, err := time.ParseDuration("10s")
+		require.NoError(t, err)
+		client := NewTelnetClient("8.8.8.8", d, os.Stdin, os.Stdout)
+		require.Error(t, client.Connect())
 	})
 }
