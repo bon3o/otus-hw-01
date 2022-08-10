@@ -3,38 +3,48 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/app"
+	"github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/config"
+	"github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/server/http"
+	memorystorage "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlmemory "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/etc/calendar/config.yml", "Path to configuration file")
 }
 
 func main() {
 	flag.Parse()
-
+	var storage app.Storage
 	if flag.Arg(0) == "version" {
 		printVersion()
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	cfg, err := config.NewConfig(configFile)
+	if err != nil {
+		fmt.Println("Error loading config: ", err)
+	}
+	logg := logger.New(cfg.Logger.Level)
+	if cfg.Storage.Driver == "in-memory" {
+		storage = memorystorage.New(logg)
+	} else {
+		storage = sqlmemory.New(cfg, logg)
+	}
 
-	storage := memorystorage.New()
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(logg, calendar)
+	server := internalhttp.NewServer(logg, calendar, cfg.Server.Host, cfg.Server.Port)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)

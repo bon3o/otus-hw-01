@@ -1,0 +1,9 @@
+logger:
+  level: "info"
+storage:
+  driver: "in-memory"
+  dsn: "user=calendar dbname=calendar password=calendar host=172.17.0.1 port=5432 sslmode=disable"
+  migration: "/home/pbotov/main/otus-hw-01/hw12_13_14_15_calendar/migrations"
+server:
+  host: "127.0.0.1"
+  port: "8080"
