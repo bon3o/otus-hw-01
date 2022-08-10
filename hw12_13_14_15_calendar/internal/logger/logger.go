@@ -1,20 +1,29 @@
 package logger
 
-import "fmt"
+import "github.com/VictoriaMetrics/VictoriaMetrics/lib/logger"
 
-type Logger struct { // TODO
+type Logger struct {
+	level string
 }
 
 func New(level string) *Logger {
-	return &Logger{}
+	return &Logger{
+		level: level,
+	}
 }
 
 func (l Logger) Info(msg string) {
-	fmt.Println(msg)
+	if l.level == "info" || l.level == "debug" {
+		logger.Infof(msg)
+	}
+}
+
+func (l Logger) Warn(msg string) {
+	if l.level == "warn" || l.level == "debug" {
+		logger.Warnf(msg)
+	}
 }
 
 func (l Logger) Error(msg string) {
-	// TODO
+	logger.Errorf("%s", msg)
 }
-
-// TODO
