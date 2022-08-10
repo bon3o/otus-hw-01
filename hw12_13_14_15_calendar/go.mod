@@ -4,5 +4,6 @@ go 1.16
 
 require (
 	github.com/VictoriaMetrics/VictoriaMetrics v1.80.0
+	github.com/gofrs/uuid v3.3.0+incompatible
 	gopkg.in/yaml.v2 v2.4.0
 )
