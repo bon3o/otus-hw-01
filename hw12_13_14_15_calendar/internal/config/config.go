@@ -10,9 +10,9 @@ import (
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
 type Config struct {
-	Logger  LoggerConf
-	Storage StorageConf
-	Server  ServerConf
+	Logger  LoggerConf  `yaml:"logger"`
+	Storage StorageConf `yaml:"storage"`
+	Server  ServerConf  `yaml:"server"`
 }
 
 type LoggerConf struct {
@@ -20,8 +20,9 @@ type LoggerConf struct {
 }
 
 type StorageConf struct {
-	Driver string `yaml:"driver"`
-	Source string `yaml:"source"`
+	Driver    string `yaml:"driver"`
+	Dsn       string `yaml:"dsn"`
+	Migration string `yaml:"migration"`
 }
 
 type ServerConf struct {
@@ -43,4 +44,14 @@ func NewConfig(configPath string) (config *Config, err error) {
 	return
 }
 
-// TODO
+func (c *Config) GetDriverName() string {
+	return c.Storage.Driver
+}
+
+func (c *Config) GetDataSourceName() string {
+	return c.Storage.Dsn
+}
+
+func (c *Config) GetMigrationDir() string {
+	return c.Storage.Migration
+}

@@ -11,6 +11,9 @@ type App struct {
 	s   Storage
 }
 type Logger interface { // TODO
+	Info(string)
+	Warn(string)
+	Error(string)
 }
 
 type Storage interface {
@@ -19,6 +22,9 @@ type Storage interface {
 	Delete(e storage.Event) error
 	FindAll() ([]storage.Event, error)
 	GetByID(id string) (storage.Event, error)
+	Connect(ctx context.Context) error
+	Close(ctx context.Context) error
+	MigrationUp(ctx context.Context) error
 }
 
 func New(logger Logger, storage Storage) *App {

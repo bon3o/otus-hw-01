@@ -1,6 +1,7 @@
 package memorystorage
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -66,4 +67,16 @@ func (s *Storage) FindAll() ([]storage.Event, error) {
 	}
 
 	return events, nil
+}
+
+func (s *Storage) MigrationUp(ctx context.Context) error {
+	return nil
+}
+
+func (s *Storage) Connect(ctx context.Context) error {
+	return nil
+}
+
+func (s *Storage) Close(ctx context.Context) error {
+	return nil
 }

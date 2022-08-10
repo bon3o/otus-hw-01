@@ -14,6 +14,7 @@ import (
 	"github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/server/http"
 	memorystorage "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlmemory "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
@@ -24,7 +25,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-
+	var storage app.Storage
 	if flag.Arg(0) == "version" {
 		printVersion()
 		return
@@ -35,11 +36,15 @@ func main() {
 		fmt.Println("Error loading config: ", err)
 	}
 	logg := logger.New(cfg.Logger.Level)
+	if cfg.Storage.Driver == "in-memory" {
+		storage = memorystorage.New(logg)
+	} else {
+		storage = sqlmemory.New(cfg, logg)
+	}
 
-	storage := memorystorage.New(logg)
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(logg, calendar)
+	server := internalhttp.NewServer(logg, calendar, cfg.Server.Host, cfg.Server.Port)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
