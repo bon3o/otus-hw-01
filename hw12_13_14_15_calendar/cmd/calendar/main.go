@@ -16,7 +16,7 @@ import (
 	memorystorage "github.com/bon3o/otus-hw-01/hw12_13_14_15_calendar/internal/storage/memory"
 )
 
-var configFile, logFile string
+var configFile string
 
 func init() {
 	flag.StringVar(&configFile, "config", "/etc/calendar/config.yml", "Path to configuration file")
